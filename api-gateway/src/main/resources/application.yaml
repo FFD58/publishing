@@ -1,0 +1,58 @@
+server:
+  port: 8080
+
+eureka:
+  instance:
+    ## Если не указать, возникает ошибка java.net.UnknownHostException: Failed to resolve 'HOME-PC.mshome.net' [A(1), AAAA(28)]
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    root: info
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        ## Book Service Route
+        - id: book-service
+          predicates:
+            - Path=/api/books/**
+          uri: lb://book-service
+
+        ## Order Service Route
+        - id: order-service
+          predicates:
+            - Path=/api/orders/**
+          uri: lb://order-service
+
+        ## User Service Route
+        - id: user-service
+          predicates:
+            - Path=/api/users/**
+          uri: lb://user-service
+
+        ## User Task Service Route
+        - id: task-service
+          predicates:
+            - Path=/api/tasks/**
+          uri: lb://task-service
+
+        ## Eureka Server Route
+        - id: eureka-server
+          predicates:
+            - Path=/eureka/web
+          uri: http://localhost:8761
+          filters:
+            - SetPath=/
+        ## Eureka Server Static Resources Route
+        - id: eureka-server-static
+          predicates:
+            - Path=/eureka/**
+          uri: http://localhost:8761
